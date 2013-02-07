@@ -177,8 +177,6 @@ module PaperTrail
         self.class.paper_trail_on if paper_trail_was_enabled
       end
 
-      private
-
       def version_class
         version_class_name.constantize
       end
