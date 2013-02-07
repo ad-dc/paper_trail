@@ -218,7 +218,17 @@ module PaperTrail
             data["object_changes"] = PaperTrail.serializer.dump(changes_for_paper_trail)
           end
 
-          send(self.class.versions_association_name).create merge_metadata(data)
+          existing_autosave = send(self.class.versions_association_name).where(:item_type => item_before_change.class.to_s, :item_id => item_before_change.id, :event => "autosave" ).first
+          
+          if existing_autosave.nil?
+            # no autosave? make a new one
+            send(self.class.versions_association_name).create merge_metadata(data)
+          else
+            # otherwise update the existing one so we don't end up with a thousand autoupdates per record
+            existing_autosave.created_at = Time.now
+            existing_autosave.update_attributes merge_metadata(data)
+          end
+
         end
       end
 
