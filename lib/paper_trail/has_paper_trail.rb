@@ -133,6 +133,10 @@ module PaperTrail
         source_version.nil?
       end
 
+      def autosave
+        record_autosave
+      end
+
       # Returns who put the object into its current state.
       def originator
         version_class.with_item_keys(self.class.base_class.name, id).last.try :whodunnit
@@ -177,6 +181,8 @@ module PaperTrail
         self.class.paper_trail_on if paper_trail_was_enabled
       end
 
+      private
+
       def version_class
         version_class_name.constantize
       end
@@ -200,10 +206,26 @@ module PaperTrail
         end
       end
 
-      def record_update
+      def record_autosave
+        if switched_on?
+          data = {
+            :event => "autoupdate",
+            :object => object_to_string(item_before_change),
+            :whodunnit => "System"
+          }
+
+          if version_class.column_names.include? 'object_changes'
+            data["object_changes"] = PaperTrail.serializer.dump(changes_for_paper_trail)
+          end
+
+          send(self.class.versions_association_name).create merge_metadata(data)
+        end
+      end
+
+      def record_update(event="update")
         if switched_on? && changed_notably?
           data = {
-            :event     => 'update',
+            :event     => event,
             :object    => object_to_string(item_before_change),
             :whodunnit => PaperTrail.whodunnit
           }
