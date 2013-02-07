@@ -222,10 +222,10 @@ module PaperTrail
         end
       end
 
-      def record_update(event="update")
+      def record_update
         if switched_on? && changed_notably?
           data = {
-            :event     => event,
+            :event     => "update",
             :object    => object_to_string(item_before_change),
             :whodunnit => PaperTrail.whodunnit
           }
