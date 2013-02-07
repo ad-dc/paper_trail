@@ -210,7 +210,7 @@ module PaperTrail
         if switched_on?
           data = {
             :event => "autosave",
-            :object => object_to_string(item_before_change),
+            :object => object_to_string(self),
             :whodunnit => "System"
           }
 
@@ -218,7 +218,7 @@ module PaperTrail
             data["object_changes"] = PaperTrail.serializer.dump(changes_for_paper_trail)
           end
 
-          existing_autosave = send(self.class.versions_association_name).where(:item_type => item_before_change.class.to_s, :item_id => item_before_change.id, :event => "autosave" ).first
+          existing_autosave = send(self.class.versions_association_name).where(:item_type => self.class.to_s, :item_id => self.id, :event => "autosave" ).first
           
           if existing_autosave.nil?
             # no autosave? make a new one
