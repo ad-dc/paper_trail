@@ -209,7 +209,7 @@ module PaperTrail
       def record_autosave
         if switched_on?
           data = {
-            :event => "autoupdate",
+            :event => "autosave",
             :object => object_to_string(item_before_change),
             :whodunnit => "System"
           }
