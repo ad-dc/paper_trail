@@ -222,7 +222,13 @@ module PaperTrail
           
           if existing_autosave.nil?
             # no autosave? make a new one
-            send(self.class.versions_association_name).create merge_metadata(data)
+            data["item_id"] = self.id
+            data["item_type"] = self.class.to_s
+
+            binding.pry
+
+            Version.create merge_metadata(data)
+            
           else
             # otherwise update the existing one so we don't end up with a thousand autoupdates per record
             existing_autosave.created_at = Time.now
