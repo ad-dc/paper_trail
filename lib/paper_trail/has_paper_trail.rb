@@ -225,7 +225,7 @@ module PaperTrail
             data["item_id"] = self.id
             data["item_type"] = self.class.to_s
 
-            binding.pry
+            #binding.pry
 
             Version.create merge_metadata(data)
             
